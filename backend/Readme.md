@@ -46,6 +46,8 @@ This directory contains the backend code for the Gemini Project.
 
 ## Code Structure
 
+```bash
+
 ├── backend
 │ ├── src
 │ │ ├── config
@@ -75,6 +77,8 @@ This directory contains the backend code for the Gemini Project.
 │ ├── tsconfig.json # TypeScript configuration
 │ └── README.md # Project documentation
 
+```
+
 ## API Documentation
 
 (Include instructions or links to API documentation if available. For example, if you're using Swagger, mention how to access the Swagger UI.)
@@ -86,3 +90,7 @@ This directory contains the backend code for the Gemini Project.
 ## License
 
 (Specify the license under which the backend code is released.)
+
+```
+
+```
