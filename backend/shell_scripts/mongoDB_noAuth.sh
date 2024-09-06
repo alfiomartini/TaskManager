@@ -10,5 +10,5 @@ docker run -it \
 # access it from the local machine using mongosh client
 # docker exec -it mongo_server mongosh 
 #  or 
-# mongosh 
+# mongosh  "mongodb://localhost:27017/task-manager"
   
