@@ -3,20 +3,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const connectDB = async (): Promise<void> => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI!);
-    console.log("Connected to MongoDB");
-  } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-    // Instead of process.exit(), consider these options:
-    // 1. Throw the error to be caught at a higher level
-    throw error;
-
-    // 2. Log the error and try to reconnect (if appropriate)
-    // console.error("Retrying connection...");
-    // setTimeout(connectDB, 5000); // Retry after 5 seconds
-  }
+export const connectWithRetry = (): Promise<void> => {
+  return mongoose
+    .connect(process.env.MONGO_URI!)
+    .then(() => {
+      console.log("MongoDB connected successfully");
+    })
+    .catch((err) => {
+      console.error("MongoDB connection error:", err);
+      setTimeout(connectWithRetry, 5000);
+    });
 };
 
-export default connectDB;
+connectWithRetry();
