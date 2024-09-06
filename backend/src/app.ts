@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { connectWithRetry as connectDB } from "./config/db";
+import connectDB from "./config/db";
 import router from "./routes";
 
 dotenv.config();
