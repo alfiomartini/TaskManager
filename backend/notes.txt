@@ -1,0 +1,27 @@
+# Here’s a breakdown of the connection string:
+
+# mongodb://: The protocol used to connect to MongoDB.
+# mongodb: The hostname, which corresponds to the service name defined in the docker-compose.yaml file.
+# 27017: The port on which MongoDB is running.
+# task-manager: The name of the database to connect to.
+
+MONGO_URI=mongodb://mongodb:27017/task-manager
+
+-----
+
+- To run the docker compose file: docker compose up --build
+
+---
+To remove all Docker images, you can use the following command:
+
+```sh
+docker rmi $(docker images -q)
+```
+
+### Explanation
+
+- `docker images -q`: Lists all image IDs.
+- `docker rmi $(docker images -q)`: Removes all images using the listed image IDs.
+
+------
+Delete all  volumes: docker volume rm $(docker volume ls -q)
