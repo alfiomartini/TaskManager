@@ -12,11 +12,7 @@ MONGO_URI=mongodb://mongodb:27017/task-manager
 - To run the docker compose file: docker compose up --build
 
 ---
-To remove all Docker images, you can use the following command:
-
-```sh
-docker rmi $(docker images -q)
-```
+To remove all Docker images, you can use the following command: docker rmi $(docker images -q)
 
 ### Explanation
 
@@ -25,3 +21,75 @@ docker rmi $(docker images -q)
 
 ------
 Delete all  volumes: docker volume rm $(docker volume ls -q)
+
+------
+There will be no changes to the `MONGO_URI` connection string. The connection string [`mongodb://mongodb:27017/task-manager`](command:_github.copilot.openSymbolFromReferences?%5B%22mongodb%3A%2F%2Fmongodb%3A27017%2Ftask-manager%22%2C%5B%7B%22uri%22%3A%7B%22%24mid%22%3A1%2C%22fsPath%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22external%22%3A%22file%3A%2F%2F%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22path%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22scheme%22%3A%22file%22%7D%2C%22pos%22%3A%7B%22line%22%3A7%2C%22character%22%3A10%7D%7D%5D%5D "Go to definition") remains the same because the service name [`mongodb`](command:_github.copilot.openSymbolFromReferences?%5B%22mongodb%22%2C%5B%7B%22uri%22%3A%7B%22%24mid%22%3A1%2C%22fsPath%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22external%22%3A%22file%3A%2F%2F%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22path%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22scheme%22%3A%22file%22%7D%2C%22pos%22%3A%7B%22line%22%3A7%2C%22character%22%3A10%7D%7D%5D%5D "Go to definition") is still used as the hostname for the MongoDB service.
+
+### Differences Between Implicit and Explicit Network Setup
+
+1. **Implicit Network Setup**:
+   - Docker Compose automatically creates a default network for all services defined in the [`docker-compose.yaml`](command:_github.copilot.openSymbolFromReferences?%5B%22docker-compose.yaml%22%2C%5B%7B%22uri%22%3A%7B%22%24mid%22%3A1%2C%22fsPath%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22external%22%3A%22file%3A%2F%2F%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22path%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22scheme%22%3A%22file%22%7D%2C%22pos%22%3A%7B%22line%22%3A11%2C%22character%22%3A13%7D%7D%5D%5D "Go to definition") file.
+   - Services can communicate using their service names as hostnames without any additional configuration.
+   - Example:
+     ```yaml
+     services:
+       mongodb:
+         image: mongo:7.0
+       api:
+         build: .
+         depends_on:
+           - mongodb
+         environment:
+           - MONGO_URI=mongodb://mongodb:27017/task-manager
+     ```
+
+2. **Explicit Network Setup**:
+   - You define a custom network explicitly in the [`docker-compose.yaml`](command:_github.copilot.openSymbolFromReferences?%5B%22docker-compose.yaml%22%2C%5B%7B%22uri%22%3A%7B%22%24mid%22%3A1%2C%22fsPath%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22external%22%3A%22file%3A%2F%2F%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22path%22%3A%22%2Fhome%2Falfio%2Fcode%2Fencora%2FGeminiProject%2Fbackend%2Fnotes.txt%22%2C%22scheme%22%3A%22file%22%7D%2C%22pos%22%3A%7B%22line%22%3A11%2C%22character%22%3A13%7D%7D%5D%5D "Go to definition") file.
+   - Services are attached to this custom network, providing more control over network configuration and isolation.
+   - Example:
+     ```yaml
+     version: '3.8'
+
+     services:
+       mongodb:
+         image: mongo:7.0
+         networks:
+           - app-network
+       api:
+         build: .
+         depends_on:
+           - mongodb
+         environment:
+           - MONGO_URI=mongodb://mongodb:27017/task-manager
+         networks:
+           - app-network
+
+     networks:
+       app-network:
+         driver: bridge
+     ```
+
+### Key Differences
+
+- **Control and Isolation**:
+  - **Implicit**: Docker Compose handles network creation and management automatically. 
+     All services are part of the default network.
+  - **Explicit**: You have explicit control over the network configuration. 
+  Services are isolated within the custom network, which can be useful for advanced networking 
+  setups or when you need to isolate services from other containers.
+
+- **Configuration**:
+  - **Implicit**: Simpler configuration as you don't need to define networks explicitly.
+  - **Explicit**: Requires additional configuration to define and attach services to the custom network.
+
+### Summary
+
+Both setups allow services to communicate using their service names as hostnames. 
+The explicit network setup provides more control and isolation, which can be beneficial for 
+complex applications or specific networking requirements. However, for many use cases, the 
+implicit network setup is sufficient and simpler to configure.
+
+-----
+- link mongodb:db: Links the mongodb container to the api container and assigns the alias 
+   db to the linked container.
+- In your application code, you can now use db as the hostname to connect to the MongoDB container.

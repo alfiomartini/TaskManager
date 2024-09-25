@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import User from "../models/user";
+import { SignInRequestBody, SignUpRequestBody } from "../types";
+import User, { IUser } from "../models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -10,12 +11,12 @@ if (!process.env.JWT_SECRET) {
 const jwtSecret = process.env.JWT_SECRET;
 
 class AuthController {
-  async signup(req: Request, res: Response) {
+  async signup(req: Request<{}, {}, SignUpRequestBody, {}>, res: Response) {
     try {
       const { username, email, password } = req.body;
 
       // Check if user already exists
-      const existingUser = await User.findOne({
+      const existingUser: IUser | null = await User.findOne({
         $or: [{ username }, { email }],
       });
       if (existingUser) {
@@ -39,12 +40,12 @@ class AuthController {
     }
   }
 
-  async signin(req: Request, res: Response) {
+  async signin(req: Request<{}, {}, SignInRequestBody, {}>, res: Response) {
     console.log("Accessing signin route");
     try {
       const { username, password } = req.body;
 
-      const user = await User.findOne({ username });
+      const user: IUser | null = await User.findOne({ username });
       if (!user) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
