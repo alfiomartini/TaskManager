@@ -19,6 +19,20 @@ export const authenticate = (
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(401).json({ message: "Invalid token" });
+    if (error instanceof jwt.TokenExpiredError) {
+      return res
+        .status(401)
+        .json({ message: "Token has expired", expiredAt: error.expiredAt });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      return res
+        .status(401)
+        .json({ message: "Invalid token", error: error.message });
+    } else if (error instanceof jwt.NotBeforeError) {
+      return res
+        .status(401)
+        .json({ message: "Token is not valid yet", error: error.message });
+    } else {
+      return res.status(500).json({ message: "Internal server error" });
+    }
   }
 };

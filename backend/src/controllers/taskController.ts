@@ -19,6 +19,7 @@ export const createTask = async (
 ) => {
   try {
     const { title, description, dueDate, status } = req.body;
+    // userId is set by the authenticate middleware
     const userId = req.userId;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -73,7 +74,7 @@ export const getTasks = async (
 
 // Get a single task by ID
 export const getTaskById = async (
-  req: Request<TaskRequestParams>,
+  req: AuthRequest<TaskRequestParams>,
   res: Response
 ) => {
   try {
@@ -89,7 +90,7 @@ export const getTaskById = async (
 
 // Update a task
 export const updateTask = async (
-  req: Request<TaskRequestParams, {}, UpdateTaskRequestBody>,
+  req: AuthRequest<TaskRequestParams, {}, UpdateTaskRequestBody>,
   res: Response
 ) => {
   try {
@@ -109,7 +110,7 @@ export const updateTask = async (
 
 // Delete a task
 export const deleteTask = async (
-  req: Request<TaskRequestParams>,
+  req: AuthRequest<TaskRequestParams>,
   res: Response
 ) => {
   try {
