@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { AuthRequest } from "../types";
 import Task, { ITask } from "../models/task";
 import User, { IUser } from "../models/user";
 import {
@@ -13,11 +14,15 @@ import {
 
 // Create a new task
 export const createTask = async (
-  req: Request<{}, {}, CreateTaskRequestBody>,
+  req: AuthRequest<{}, {}, CreateTaskRequestBody>,
   res: Response
 ) => {
   try {
-    const { title, description, dueDate, status, userId } = req.body;
+    const { title, description, dueDate, status } = req.body;
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const user: IUser | null = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });

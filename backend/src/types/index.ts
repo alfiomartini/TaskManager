@@ -1,3 +1,12 @@
+import { Request } from "express";
+export interface AuthRequest<
+  P = {}, // URL parameters
+  ResBody = unknown, // Response body
+  ReqBody = unknown, // Request body
+  ReqQuery = unknown // Query parameters
+> extends Request<P, ResBody, ReqBody, ReqQuery> {
+  userId?: string;
+}
 export interface CreateTaskRequestBody {
   title: string;
   description: string;
