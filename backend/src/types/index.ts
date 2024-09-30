@@ -12,7 +12,6 @@ export interface CreateTaskRequestBody {
   description: string;
   dueDate: Date;
   status: "pending" | "in-progress" | "completed";
-  userId: string;
 }
 
 export interface UpdateTaskRequestBody {
@@ -42,7 +41,7 @@ export type TaskFilter = {
 };
 
 export const isValidStatus = (
-  status: unknown
+  status: string | undefined
 ): status is TaskFilter["status"] => {
   return ["pending", "in-progress", "completed"].includes(status as string);
 };
