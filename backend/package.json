@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/app.js",
     "dev": "nodemon src/app.ts",
     "build": "tsc",
-    "docker:dev": "docker compose up --build",
+    "docker:start": "docker compose up --build",
+    "docker:stop": "docker compose down",
+    "start": "node dist/app.js",
+    "secret:jwt": "ts-node generateJsonToken.ts",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },

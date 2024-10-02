@@ -23,20 +23,36 @@ This directory contains the backend code for the Gemini Project.
      npm install
      ```
 
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following environment variables:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb://mongo:27017/your-database
+JWT_SECRET=your_jwt_secret
+```
+
+To genereate the JWT_SECRET, run:
+
+```bash
+  npm run secret:jwt
+```
+
 ## Usage
 
 1. Start the development server using Docker:
 
    ```bash
-   docker compose up
+   mpm run docker:start
    ```
 
    This command will start both the backend server and the database.
 
-2. Stop the development server:
+2. Stop the development server and the database:
 
    ```bash
-   docker compose down
+   npm run docker:stop
    ```
 
 3. Build the project for production:
@@ -49,16 +65,6 @@ This directory contains the backend code for the Gemini Project.
    ```bash
    npm start
    ```
-
-## Environment Variables
-
-Create a `.env` file in the root directory and add the following environment variables:
-
-```env
-PORT=3000
-MONGODB_URI=mongodb://mongo:27017/your-database
-JWT_SECRET=your_jwt_secret
-```
 
 ## API Documentation
 
@@ -78,28 +84,49 @@ JWT_SECRET=your_jwt_secret
 ## Code Structure
 
 ```bash
-├── backend
-│   ├── src
-│   │   ├── config
-│   │   │   └── database.ts # MongoDB connection setup
-│   │   ├── controllers
-│   │   │   ├── authController.ts # Handles sign-up, login, etc.
-│   │   │   └── taskController.ts # Task-related CRUD operations
-│   │   ├── middleware
-│   │   │   └── authMiddleware.ts # Middleware to protect routes
-│   │   ├── models
-│   │   │   ├── userModel.ts # User schema and model
-│   │   │   └── taskModel.ts # Task schema and model
-│   │   ├── routes
-│   │   │   ├── auth.ts # Authentication routes
-│   │   │   └── tasks.ts # Task routes
-│   │   ├── types
-│   │   │   └── index.ts # Type definitions
-│   │   └── app.ts # Express app setup
+.
+├── Dockerfile
+├── Readme.md
+├── compose.yaml
+├── generateJsonToken.ts
+├── jest.config.ts
+├── node_modules
+├── notes.txt
+├── package-lock.json
+├── package.json
+├── src
+│   ├── app.ts # Express app setup
+│   ├── config
+│   │   └── database.ts # MongoDB connection setup
+│   ├── controllers
+│   │   ├── authController.ts # Handles sign-up, login, etc.
+│   │   └── taskController.ts # Task-related CRUD operations
+│   ├── middleware
+│   │   └── authMiddleware.ts # Middleware to protect routes
+│   ├── models
+│   │   ├── userModel.ts # User schema and model
+│   │   └── taskModel.ts # Task schema and model
+│   ├── routes
+│   │   ├── auth.ts # Authentication routes
+│   │   └── tasks.ts # Task routes
+│   ├── types
+│   │   └── index.ts # Type definitions
 │   ├── tests
-│   │   ├── auth.test.ts # Authentication tests
-│   │   └── tasks.test.ts # Task tests
-│   └── server.ts # Entry point of the application
+│   │   ├── config
+│   │   │   └── db.test.ts
+│   │   ├── controllers
+│   │   │   ├── authController.test.ts
+│   │   │   └── taskController.test.ts
+│   │   ├── middleware
+│   │   │   └── index.test.ts
+│   │   ├── routes
+│   │   │   ├── authRoutes.test.ts
+│   │   │   ├── index.test.ts
+│   │   │   └── taskRoutes.test.ts
+│   │   └── sample.test.ts
+│   └── utils
+├── start.sh
+└── tsconfig.json
 ```
 
 ## Testing
