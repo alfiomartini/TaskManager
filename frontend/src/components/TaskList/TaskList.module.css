@@ -1,0 +1,14 @@
+.taskListContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 16px; /* Added gap between tasks */
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.taskListTitle {
+  font-size: 2em;
+  margin-bottom: 16px;
+  color: #333;
+}

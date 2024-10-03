@@ -1,0 +1,25 @@
+.taskContainer {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 8px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.taskTitle {
+  font-size: 1.5em;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.taskDescription {
+  font-size: 1em;
+  margin-bottom: 8px;
+  color: #666;
+}
+
+.taskMeta {
+  font-size: 0.9em;
+  color: #999;
+}

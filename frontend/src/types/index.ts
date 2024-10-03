@@ -12,3 +12,14 @@ export interface SignInForm {
 export interface AuthResponse {
   message: string;
 }
+
+export interface Task {
+  _id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: string;
+  user: string;
+  createdAt: string;
+  updatedAt: string;
+}

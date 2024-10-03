@@ -1,4 +1,4 @@
-import { SignUpForm, SignInForm, AuthResponse } from "../types";
+import { SignUpForm, SignInForm, AuthResponse, Task } from "../types";
 import axios from "axios";
 
 export const authSignUp = async (
@@ -27,6 +27,32 @@ export const authSignIn = async (
       "http://localhost:3000/api/auth/signin",
       formData
     );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+export const taskList = async (): Promise<Task[]> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    const response = await axios.get<Task[]>(
+      "http://localhost:3000/api/tasks/list",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
