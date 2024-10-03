@@ -1,11 +1,17 @@
-import { SignUpForm, SignInForm, AuthResponse, Task } from "../types";
+import {
+  SignUpForm,
+  SignInForm,
+  Task,
+  SignInResponse,
+  SignUpResponse,
+} from "../types";
 import axios from "axios";
 
 export const authSignUp = async (
   formData: SignUpForm
-): Promise<AuthResponse> => {
+): Promise<SignUpResponse> => {
   try {
-    const response = await axios.post<AuthResponse>(
+    const response = await axios.post<SignUpResponse>(
       "http://localhost:3000/api/auth/signup",
       formData
     );
@@ -21,9 +27,9 @@ export const authSignUp = async (
 
 export const authSignIn = async (
   formData: SignInForm
-): Promise<AuthResponse> => {
+): Promise<SignInResponse> => {
   try {
-    const response = await axios.post<AuthResponse>(
+    const response = await axios.post<SignInResponse>(
       "http://localhost:3000/api/auth/signin",
       formData
     );

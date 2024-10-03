@@ -23,3 +23,11 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface SignUpResponse {
+  message: string;
+}
+
+export interface SignInResponse {
+  token: string;
+}
