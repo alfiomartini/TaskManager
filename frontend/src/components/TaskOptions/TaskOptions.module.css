@@ -1,0 +1,20 @@
+.taskOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  margin-top: 60px; /* To avoid overlap with the fixed navbar */
+}
+
+.taskOptions a {
+  color: #282c34;
+  text-decoration: none;
+  padding: 10px;
+  border: 1px solid #282c34;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.taskOptions a:hover {
+  background-color: #f1f1f1;
+}

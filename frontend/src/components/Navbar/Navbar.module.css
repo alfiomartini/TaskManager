@@ -1,0 +1,35 @@
+.nav {
+  background-color: #282c34;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+}
+
+/* Responsive styling */
+@media (max-width: 600px) {
+  .nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
