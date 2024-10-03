@@ -10,23 +10,26 @@ import SignIn from "./components/SignIn/SignIn";
 import SignUp from "./components/SignUp/SignUp";
 import TaskOptions from "./components/TaskOptions/TaskOptions";
 import Navbar from "./components/Navbar/Navbar";
+import styles from "./App.module.css";
 
 const App: React.FC = () => {
   return (
-    <div>
+    <div className={styles.mainContainer}>
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/tasks" element={<TaskOptions />} />
-        <Route path="/tasks/create" element={<CreateTask />} />
-        <Route path="/tasks/list" element={<ListTasks />} />
-        <Route path="/tasks/get" element={<GetTask />} />
-        <Route path="/tasks/update" element={<UpdateTask />} />
-        <Route path="/tasks/delete" element={<DeleteTask />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/logout" element={<Home />} />
-      </Routes>
+      <div className={styles.content}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/tasks" element={<TaskOptions />} />
+          <Route path="/tasks/create" element={<CreateTask />} />
+          <Route path="/tasks/list" element={<ListTasks />} />
+          <Route path="/tasks/get" element={<GetTask />} />
+          <Route path="/tasks/update" element={<UpdateTask />} />
+          <Route path="/tasks/delete" element={<DeleteTask />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/logout" element={<Home />} />
+        </Routes>
+      </div>
     </div>
   );
 };
