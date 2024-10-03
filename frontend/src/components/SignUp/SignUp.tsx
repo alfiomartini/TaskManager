@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { SignUpForm } from "../../types";
 import { authSignUp } from "../../utils";
+import { useNavigate } from "react-router-dom";
 import styles from "./SignUp.module.css";
 
 const SignUp: React.FC = () => {
@@ -10,6 +11,8 @@ const SignUp: React.FC = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -17,14 +20,16 @@ const SignUp: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Basic validation
-    if (!formData.username || !formData.email || !formData.password) {
-      alert("All fields are required");
-      return;
+    try {
+      const response = await authSignUp(formData);
+      alert("Sign up successful: " + response.message);
+      setFormData({ username: "", email: "", password: "" });
+      navigate("/signin");
+    } catch (error) {
+      alert((error as Error).message);
     }
-    authSignUp(formData);
   };
 
   return (
