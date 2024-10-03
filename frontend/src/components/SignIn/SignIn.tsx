@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { SignInForm } from "../../types";
 import { authSignIn } from "../../utils";
+import { useNavigate } from "react-router-dom";
 import styles from "./SignIn.module.css";
 
 const SignIn: React.FC = () => {
@@ -9,6 +10,8 @@ const SignIn: React.FC = () => {
     password: "",
   });
 
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -16,14 +19,18 @@ const SignIn: React.FC = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Basic validation
-    if (!formData.username || !formData.password) {
-      alert("All fields are required");
-      return;
+    try {
+      const response = await authSignIn(formData);
+      const token = response.token;
+      console.log("Token:", token);
+      localStorage.setItem("token", token);
+      alert("Sign in successful");
+      navigate("/tasks");
+    } catch (error) {
+      alert((error as Error).message);
     }
-    authSignIn(formData);
   };
 
   return (
