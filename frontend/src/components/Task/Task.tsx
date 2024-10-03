@@ -9,7 +9,7 @@ interface TaskProps {
 const Task: React.FC<TaskProps> = ({ task }) => {
   return (
     <div className={styles.taskContainer}>
-      <h3 className={styles.taskTitle}>{task.title}</h3>
+      <h6 className={styles.taskTitle}>{task.title}</h6>
       <p className={styles.taskDescription}>{task.description}</p>
       <p className={styles.taskMeta}>
         Due Date: {new Date(task.dueDate).toLocaleDateString()}
@@ -21,6 +21,8 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       <p className={styles.taskMeta}>
         Updated At: {new Date(task.updatedAt).toLocaleDateString()}
       </p>
+      <button className={styles.taskButton}>Update</button>
+      <button className={styles.taskButton}>Delete</button>
     </div>
   );
 };

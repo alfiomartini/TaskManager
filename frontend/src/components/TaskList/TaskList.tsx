@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { taskList } from "../../utils";
 import Task from "../Task/Task";
 import { Task as TaskType } from "../../types";
+import AddTaskForm from "../AddTaskForm/AddTaskForm";
 import styles from "./TaskList.module.css";
 
 const TaskList: React.FC = () => {
@@ -27,9 +28,14 @@ const TaskList: React.FC = () => {
 
   return (
     <div className={styles.taskListContainer}>
-      {tasks.map((task) => (
-        <Task key={task._id} task={task} />
-      ))}
+      <div className={styles.tasks}>
+        {tasks.map((task) => (
+          <Task key={task._id} task={task} />
+        ))}
+      </div>
+      <div className={styles.addTaskForm}>
+        <AddTaskForm />
+      </div>
     </div>
   );
 };

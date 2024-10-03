@@ -68,3 +68,12 @@ export const taskList = async (): Promise<Task[]> => {
     }
   }
 };
+
+export const addTask = (task: {
+  title: string;
+  description: string;
+  dueDate: string;
+  status: string;
+}) => {
+  console.log("Adding task:", task);
+};
