@@ -57,7 +57,7 @@ class AuthController {
 
       // Create and sign JWT (replace 'your-secret-key' with your actual secret)
       const token = jwt.sign({ userId: user._id }, jwtSecret, {
-        expiresIn: "1h",
+        expiresIn: "24h",
       });
 
       res.json({ token });
