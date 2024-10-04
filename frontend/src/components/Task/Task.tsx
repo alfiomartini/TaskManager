@@ -4,12 +4,23 @@ import styles from "./Task.module.css";
 
 interface TaskProps {
   task: TaskType;
+  onDelete: (id: string) => Promise<void>;
 }
 
-const Task: React.FC<TaskProps> = ({ task }) => {
+const Task: React.FC<TaskProps> = ({ task, onDelete }) => {
+  const handleDelete = async () => {
+    try {
+      await onDelete(task._id);
+      console.log(`Task with id ${task._id} deleted`);
+    } catch (error) {
+      console.error("Error deleting task:", (error as Error).message);
+      alert("Error deleting task");
+    }
+  };
+
   return (
     <div className={styles.taskContainer}>
-      <h6 className={styles.taskTitle}>{task.title}</h6>
+      <h3 className={styles.taskTitle}>{task.title}</h3>
       <p className={styles.taskDescription}>{task.description}</p>
       <p className={styles.taskMeta}>
         Due Date: {new Date(task.dueDate).toLocaleDateString()}
@@ -21,8 +32,10 @@ const Task: React.FC<TaskProps> = ({ task }) => {
       <p className={styles.taskMeta}>
         Updated At: {new Date(task.updatedAt).toLocaleDateString()}
       </p>
+      <button className={styles.taskButton} onClick={handleDelete}>
+        Delete
+      </button>
       <button className={styles.taskButton}>Update</button>
-      <button className={styles.taskButton}>Delete</button>
     </div>
   );
 };

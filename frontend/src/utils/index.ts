@@ -77,3 +77,26 @@ export const addTask = (task: {
 }) => {
   console.log("Adding task:", task);
 };
+
+export const deleteTask = async (id: string): Promise<void> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    await axios.delete(`http://localhost:3000/api/tasks/delete/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(`Task with id ${id} deleted successfully`);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};

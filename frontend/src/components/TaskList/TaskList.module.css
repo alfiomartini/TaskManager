@@ -10,6 +10,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   gap: 16px; /* Gap between tasks */
+  align-items: flex-start; /* Align items to the start to prevent stretching */
 }
 
 .addTaskForm {
