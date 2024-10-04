@@ -5,9 +5,10 @@ import styles from "./Task.module.css";
 interface TaskProps {
   task: TaskType;
   onDelete: (id: string) => Promise<void>;
+  onUpdate: () => void; // New callback for triggering update
 }
 
-const Task: React.FC<TaskProps> = ({ task, onDelete }) => {
+const Task: React.FC<TaskProps> = ({ task, onDelete, onUpdate }) => {
   const handleDelete = async () => {
     try {
       await onDelete(task._id);
@@ -35,7 +36,9 @@ const Task: React.FC<TaskProps> = ({ task, onDelete }) => {
       <button className={styles.taskButton} onClick={handleDelete}>
         Delete
       </button>
-      <button className={styles.taskButton}>Update</button>
+      <button className={styles.taskButton} onClick={onUpdate}>
+        Update
+      </button>
     </div>
   );
 };

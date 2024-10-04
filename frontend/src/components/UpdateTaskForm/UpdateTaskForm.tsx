@@ -1,31 +1,50 @@
-import React, { useState } from "react";
-import { Task, TaskStatus } from "../../types";
-import styles from "./AddTaskForm.module.css";
+import React, { useEffect, useState } from "react";
+import { Task as TaskType, TaskStatus } from "../../types";
+import { updateTask } from "../../utils";
+import styles from "./UpdateTaskForm.module.css";
 
-interface AddTaskFormProps {
-  onAddTask: (
-    task: Omit<Task, "_id" | "user" | "createdAt" | "updatedAt">
-  ) => Promise<void>;
+interface UpdateTaskFormProps {
+  task: TaskType;
+  onUpdate: (updatedTask: TaskType) => void;
+  onCancel: () => void;
 }
 
-const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
-  const [task, setTask] = useState<
-    Omit<Task, "_id" | "user" | "createdAt" | "updatedAt">
+const UpdateTaskForm: React.FC<UpdateTaskFormProps> = ({
+  task,
+  onUpdate,
+  onCancel,
+}) => {
+  const [updatedTask, setUpdatedTask] = useState<
+    Omit<TaskType, "_id" | "user" | "createdAt" | "updatedAt">
   >({
-    title: "",
-    description: "",
-    dueDate: "",
-    status: "pending" as TaskStatus,
+    title: task.title,
+    description: task.description,
+    dueDate: task.dueDate,
+    status: task.status as TaskStatus,
   });
-
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [apiError, setApiError] = useState<string | null>(null);
 
+  useEffect(() => {
+    // Manually format the due date to YYYY-MM-DD
+    const date = new Date(task.dueDate);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const formattedDueDate = `${year}-${month}-${day}`;
+
+    setUpdatedTask((prevState) => ({
+      ...prevState,
+      dueDate: formattedDueDate,
+    }));
+  }, [task.dueDate]);
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-    if (!task.title) newErrors.title = "Title is required";
-    if (!task.description) newErrors.description = "Description is required";
-    if (!task.dueDate) newErrors.dueDate = "Due date is required";
+    if (!updatedTask.title) newErrors.title = "Title is required";
+    if (!updatedTask.description)
+      newErrors.description = "Description is required";
+    if (!updatedTask.dueDate) newErrors.dueDate = "Due date is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -36,20 +55,15 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
     >
   ) => {
     const { name, value } = e.target;
-    setTask({ ...task, [name]: value });
+    setUpdatedTask({ ...updatedTask, [name]: value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       try {
-        await onAddTask(task);
-        setTask({
-          title: "",
-          description: "",
-          dueDate: "",
-          status: "pending" as TaskStatus,
-        });
+        const updated = await updateTask(task._id, updatedTask);
+        onUpdate(updated);
         setApiError(null); // Clear any previous API errors
       } catch (error) {
         setApiError((error as Error).message);
@@ -59,14 +73,14 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <h3>Add New Task</h3>
+      <h3>Update Task</h3>
       <div className={styles.formGroup}>
         <label htmlFor="title">Title</label>
         <input
           type="text"
           id="title"
           name="title"
-          value={task.title}
+          value={updatedTask.title}
           onChange={handleChange}
         />
         {errors.title && <span className={styles.error}>{errors.title}</span>}
@@ -76,7 +90,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
         <textarea
           id="description"
           name="description"
-          value={task.description}
+          value={updatedTask.description}
           onChange={handleChange}
         />
         {errors.description && (
@@ -89,7 +103,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
           type="date"
           id="dueDate"
           name="dueDate"
-          value={task.dueDate}
+          value={updatedTask.dueDate}
           onChange={handleChange}
         />
         {errors.dueDate && (
@@ -101,7 +115,7 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
         <select
           id="status"
           name="status"
-          value={task.status}
+          value={updatedTask.status}
           onChange={handleChange}
           className={styles.select}
         >
@@ -111,9 +125,12 @@ const AddTaskForm: React.FC<AddTaskFormProps> = ({ onAddTask }) => {
         </select>
       </div>
       {apiError && <div className={styles.apiError}>{apiError}</div>}
-      <button type="submit">Add Task</button>
+      <button type="submit">Update Task</button>
+      <button type="button" onClick={onCancel}>
+        Cancel
+      </button>
     </form>
   );
 };
 
-export default AddTaskForm;
+export default UpdateTaskForm;

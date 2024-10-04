@@ -1,3 +1,5 @@
+export type TaskStatus = "pending" | "in-progress" | "completed";
+
 export interface SignUpForm {
   username: string;
   email: string;
@@ -18,7 +20,7 @@ export interface Task {
   title: string;
   description: string;
   dueDate: string;
-  status: string;
+  status: TaskStatus;
   user: string;
   createdAt: string;
   updatedAt: string;

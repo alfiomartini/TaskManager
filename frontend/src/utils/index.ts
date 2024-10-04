@@ -5,7 +5,7 @@ import {
   SignInResponse,
   SignUpResponse,
 } from "../types";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export const authSignUp = async (
   formData: SignUpForm
@@ -69,13 +69,33 @@ export const taskList = async (): Promise<Task[]> => {
   }
 };
 
-export const addTask = (task: {
-  title: string;
-  description: string;
-  dueDate: string;
-  status: string;
-}) => {
-  console.log("Adding task:", task);
+export const addTask = async (
+  task: Omit<Task, "_id" | "user" | "createdAt" | "updatedAt">
+): Promise<Task> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response: AxiosResponse<Task> = await axios.post(
+      "http://localhost:3000/api/tasks/create",
+      task,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
 };
 
 export const deleteTask = async (id: string): Promise<void> => {
@@ -92,6 +112,36 @@ export const deleteTask = async (id: string): Promise<void> => {
     });
 
     console.log(`Task with id ${id} deleted successfully`);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.message);
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+export const updateTask = async (
+  id: string,
+  task: Omit<Task, "_id" | "user" | "createdAt" | "updatedAt">
+): Promise<Task> => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
+    const response: AxiosResponse<Task> = await axios.put(
+      `http://localhost:3000/api/tasks/update/${id}`,
+      task,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       throw new Error(error.response.data.message);
