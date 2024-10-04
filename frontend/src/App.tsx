@@ -13,11 +13,11 @@ const App: React.FC = () => {
       <Navbar />
       <div className={styles.content}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<SignIn />} />
           <Route path="/tasks" element={<TaskList />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/logout" element={<Home />} />
+          <Route path="/logout" element={<SignIn />} />
         </Routes>
       </div>
     </div>
