@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: task-manager
+    volumes:
+      - mongodb_data:/data/db
+
+  api:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - ./backend:/usr/src/app # Mount the current 'backend' folder to app
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app # Mount the current 'frontend' folder to app
+
+volumes:
+  mongodb_data:
