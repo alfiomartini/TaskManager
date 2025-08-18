@@ -18,8 +18,8 @@ services:
     depends_on:
       - mongodb
     environment:
-      - MONGO_URI=${MONGO_URI}
-      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI='mongodb://mongodb:27017/task-manager'
+      - JWT_SECRET='your-secret-key' # hardcoded for development only
     volumes:
       - .:/user/src/app # Mount the current 'backend' folder to app
 

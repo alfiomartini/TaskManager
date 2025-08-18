@@ -20,13 +20,23 @@ This is the Gemini Project, which includes both the frontend and backend service
 
    ```
 
-2. Navigate to your repo
+2. **Set up Environment Variables**
+
+   This project uses a `.env` file to manage secrets like JWT keys. To get started, copy the example file:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Open the new `.env` file and add your secret values for `JWT_SECRET`, `MONGO_USER`, and `MONGO_PASSWORD`. The `.env` file is ignored by Git, so your secrets will not be committed.
 
 ## Usage
 
-- To the start the entire project, run: `docker compose up --build`
-- To start the entire project, run: `docker compose down`
-- To view the logs for all service, run: `docker compose logs -f`
+- To start the project: `docker compose up [--build]`
+- To stop the project (keeps data): `docker compose down`
+- To stop the project and remove all data: `docker compose down --volumes`
+- To view logs for all services: `docker compose logs -f`
+- To access the Mongo Express UI, open your browser and go to `http://localhost:8081`.
 
 ### Project Structure
 
