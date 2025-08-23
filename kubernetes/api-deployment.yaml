@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../compose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    service: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../compose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        service: api
+    spec:
+      containers:
+        - env:
+            - name: JWT_SECRET
+              value: a-much-better-secret-that-is-not-in-git
+            - name: MONGO_URI
+              value: mongodb://admin:secret@mongo:27017/task-manager?authSource=admin
+          image: taskmanager-api
+          imagePullPolicy: IfNotPresent
+          name: taskmanager-api
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+      restartPolicy: Always

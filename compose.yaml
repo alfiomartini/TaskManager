@@ -1,6 +1,7 @@
 services:
   mongo:
     image: mongo:7.0
+    container_name: taskmanager-mongo
     restart: always
     ports:
       - "27017:27017"
@@ -15,6 +16,8 @@ services:
 
   api:
     build: ./backend
+    image: taskmanager-api
+    container_name: taskmanager-api
     ports:
       - "3000:3000"
     depends_on:
@@ -29,6 +32,8 @@ services:
 
   frontend:
     build: ./frontend
+    image: taskmanager-frontend
+    container_name: taskmanager-frontend
     ports:
       - "5173:5173"
     depends_on:
@@ -40,6 +45,7 @@ services:
 
   mongo-express:
     image: mongo-express
+    container_name: taskmanager-mongo-express
     restart: always
     ports:
       - 8081:8081

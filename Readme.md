@@ -51,6 +51,20 @@ This is the Task Manager, which includes both the frontend and backend services.
 - Frontend: The React application is available at http://localhost:5173.
 - Backend API: The Node.js Express API is running at http://localhost:3000.
 
+## Kubernets
+
+### Running the application:
+
+```bash
+minikube start
+eval $(minikube docker-env)
+docker)compose build
+kubectl apply -f kubernetes/
+kubectl get pods -w
+minikube service frontend
+minikube dashboard
+```
+
 ### Project Structure
 
 ```bash
