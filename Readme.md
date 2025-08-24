@@ -1,6 +1,6 @@
 # Task Manager
 
-This is the Task Manager, which includes both the frontend and backend services. The frontend is built with React and Vite, while the backend is built with Node.js and Express. The project uses MongoDB as the database.
+This is the Task Manager, a full-stack application featuring a React frontend and a Node.js/Express backend, with MongoDB as the database. The project is fully containerized and includes configurations to run the entire stack on both Docker Compose for local development and Kubernetes (via Minikube) for a more robust deployment simulation.
 
 ## Table of Contents
 
