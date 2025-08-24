@@ -57,27 +57,50 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     ```bash
     minikube start
     ```
-2.  **Point your Docker client to Minikube's daemon:** This crucial step ensures that when you build images, they are available inside the Minikube cluster.
+2.  **Create Kubernetes Secrets:**
+    The Kubernetes deployment requires secrets to be stored in a `Secret` object, defined in `kubernetes/taskmanager-secrets.yaml`. Unlike Docker Compose which can read a `.env` file directly, Kubernetes requires all values in the `data` field of a secret to be Base64 encoded.
+
+    First, open `kubernetes/taskmanager-secrets.yaml` to see the structure. You will need to generate a Base64 string for each of your secret values from your `.env` file.
+
+    To encode a value, use the following command. The `-n` flag is important as it prevents `echo` from adding a newline character.
+
+    ```bash
+    # Example for encoding the mongo user 'admin'
+    echo -n 'admin' | base64
+    # Output: YWRtaW4=
+    ```
+
+    To decode and verify a value, use this command:
+
+    ```bash
+    # Example for decoding the string
+    echo 'YWRtaW4=' | base64 --decode
+    # Output: admin
+    ```
+
+    Run the encoding command for each of your secrets and paste the resulting strings into the appropriate fields in `kubernetes/taskmanager-secrets.yaml`.
+
+3.  **Point your Docker client to Minikube's daemon:** This crucial step ensures that when you build images, they are available inside the Minikube cluster.
     ```bash
     eval $(minikube docker-env)
     ```
-3.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
+4.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
     ```bash
     docker compose build
     ```
-4.  **Apply the Kubernetes manifests:** This creates all the necessary Deployments, Services, and the PersistentVolumeClaim in your cluster.
+5.  **Apply the Kubernetes manifests:** This creates all the necessary Deployments, Services, Secrets, and the PersistentVolumeClaim in your cluster.
     ```bash
     kubectl apply -f kubernetes/
     ```
-5.  **Check pod status (optional):** Wait for all pods to be in the `Running` state.
+6.  **Check pod status (optional):** Wait for all pods to be in the `Running` state.
     ```bash
     kubectl get pods -w
     ```
-6.  **Access the application:** This command creates a tunnel to the frontend service and opens it in your browser.
+7.  **Access the application:** This command creates a tunnel to the frontend service and opens it in your browser.
     ```bash
     minikube service frontend
     ```
-7.  **Open the Kubernetes Dashboard (optional):**
+8.  **Open the Kubernetes Dashboard (optional):**
     ```bash
     minikube dashboard
     ```

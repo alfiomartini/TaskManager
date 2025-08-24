@@ -22,14 +22,26 @@ spec:
     spec:
       containers:
         - env:
-            - name: ME_CONFIG_BASICAUTH_PASSWORD
-              value: myexpresspass
             - name: ME_CONFIG_BASICAUTH_USERNAME
-              value: myexpressuser
-            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
-              value: secret
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: express-user
+            - name: ME_CONFIG_BASICAUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: express-password
             - name: ME_CONFIG_MONGODB_ADMINUSERNAME
-              value: admin
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-user
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-password
             - name: ME_CONFIG_MONGODB_AUTH_DATABASE
               value: admin
             - name: ME_CONFIG_MONGODB_SERVER

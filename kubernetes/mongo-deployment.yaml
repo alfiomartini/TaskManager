@@ -26,10 +26,16 @@ spec:
         - env:
             - name: MONGO_INITDB_DATABASE
               value: task-manager
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: secret
             - name: MONGO_INITDB_ROOT_USERNAME
-              value: admin
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-user
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-password
           image: mongo:7.0
           name: taskmanager-mongo
           ports:

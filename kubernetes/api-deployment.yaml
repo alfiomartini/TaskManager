@@ -25,9 +25,22 @@ spec:
       containers:
         - env:
             - name: JWT_SECRET
-              value: a-much-better-secret-that-is-not-in-git
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: jwt-secret
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-user
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskmanager-secrets
+                  key: mongo-password
             - name: MONGO_URI
-              value: mongodb://admin:secret@mongo:27017/task-manager?authSource=admin
+              value: mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongo:27017/task-manager?authSource=admin
           image: taskmanager-api
           imagePullPolicy: IfNotPresent
           name: taskmanager-api
