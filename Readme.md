@@ -55,7 +55,13 @@ This is the recommended method for local development, as it provides hot-reloadi
     docker compose logs [-f]
     ```
 
-3.  **View Logs for a Specific Service:**
+3.  **Access the application:**
+
+    - Frontend: The React application is available at http://localhost:5173.
+    - Backend API: The Node.js Express API is running at http://localhost:3000.
+    - Mongo Express: The database UI is available at http://localhost:8081.
+
+4.  **View Logs for a Specific Service:**
     If you need to debug a specific part of the application, you can view the logs for an individual service:
 
     ```bash
@@ -69,7 +75,7 @@ This is the recommended method for local development, as it provides hot-reloadi
     docker compose logs [-f] mongo
     ```
 
-4.  **Stop the services:**
+5.  **Stop the services:**
 
     - **To stop the containers (preserving data):**
       This is the standard way to stop the application. Your database data and `node_modules` volumes will be kept.
@@ -82,7 +88,7 @@ This is the recommended method for local development, as it provides hot-reloadi
       docker compose down --volumes
       ```
 
-5.  **Updating Dependencies (Important):**
+6.  **Updating Dependencies (Important):**
     Because this project isolates the container's `node_modules` for performance and stability, you must follow these steps whenever you add or remove a package in `package.json`:
 
     ```bash
@@ -152,12 +158,6 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     ```bash
     minikube dashboard
     ```
-
-## Application Access
-
-- Frontend: The React application is available at http://localhost:5173.
-- Backend API: The Node.js Express API is running at http://localhost:3000.
-- Mongo Express: The database UI is available at http://localhost:8081.
 
 ## Project Structure
 

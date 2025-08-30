@@ -8,6 +8,7 @@ metadata:
     service: mongo
   name: mongo
 spec:
+  type: ClusterIP
   ports:
     - name: "27017"
       port: 27017

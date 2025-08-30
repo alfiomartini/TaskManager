@@ -8,6 +8,7 @@ metadata:
     service: mongo-express
   name: mongo-express
 spec:
+  type: ClusterIP
   ports:
     - name: "8081"
       port: 8081

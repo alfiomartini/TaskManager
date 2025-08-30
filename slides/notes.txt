@@ -1,0 +1,105 @@
+What is Kubernetes
+
+- Official Definition
+- What Problems does Kubernetes Solve 
+- What are the tasks of an orchestration tool?
+- Problem-Solution Case Study
+- Basic Architecture
+   - Master-Slave Nodes
+   - K8S processes
+- Basic Concepts and Components (Pods, Containers, Deployments, Services)
+- Configurations
+- Demo 1: From Docker Compose to Kubernetes
+-----
+
+Official Definition
+
+- Open Source container orchestration tool
+- Developed originally by Google
+- Helps you manage containerized applications in different environments 
+   - Physical Machines
+   - Virtual Machines
+   - Cloud Environments 
+   
+----
+
+What Problems does Kubernetes Solve?
+
+- Trend from Monolith to Microservices 
+- Increased usage of Containers
+- Containers are the perfect host for small/independent applications (Microservices)
+- Applications are now comprised by hundreds/thousands of Containers
+- Using scripts/self-made tools is not an option 
+
+---
+
+What are the tasks of an orchestration tool?
+
+- High Availability (or no Downtime)
+- Scalability or high performance 
+- Disaster recovery - backup and restore 
+
+---
+
+Kubernetes Basic Architecture
+
+- At least one master node 
+- Connected to it a set of worker nodes 
+- Each worker node has a kubelet process running on it 
+- A kubernetes cluster ois comprised my the master node and the worker nodes 
+- Kubelet is a process that makes possible the nodes of the process to 
+  to each other 
+- Each worker node have docker containers of different applications running on it
+- On the Master node (Control Plane) several processes are running:
+   - An API server (which is also a container)
+   - The API server is the entry point to the K8S cluster 
+   - This is the process which different kubernetes clients will tal to:
+      - UI 
+      - API 
+      - CLI 
+   - Controller Manager 
+      - keeps track of what is happening in the cluster 
+   - Scheduler 
+      - Responsible for scheduling containers on different nodes.
+      - Based on the workload and available resources on each node
+   - etcd key-value store 
+     - Holds at anytime time the state of the Kubernetes cluster 
+   - Virtual Network 
+      - Enables worker nodes and master nodes to talk to each other 
+      - Turns all the nodes in the cluster into an unified and powerful machine 
+- If you loose the master node you won't be able to access the cluster anymore
+  - In production environments you would have at least two master nodes 
+
+
+---
+
+Kubernetes Basic Concepts and Components (Pods, Containers, Deployments, Services)
+
+- A Pod is the smallest unit that is configurable in a K8S application 
+- A Pod is a wrapper for a container 
+- Each worker node can have multiple Pods 
+- Usually one container per Pod
+- The exception is when the container needs helper containers (logging, etc)
+- One Pod per Application (service if you think of docker compose)
+- The Virtual Network assigns each Pod its own IP address
+- Each Pod is its own self-contained server 
+- Pods communicate with each other using this dedicated IP addresses 
+- In K8S you work with Pods instead of containers
+- However, Pods are ephemeral components (why?)
+- Pods are recreated frequently 
+- But when I new Pod is created, it gets a new IP address 
+- Thus communication amongst applications using IPs won't work 
+- That is where services come into play 
+- A service is a replacement for the Pods's IP addresses 
+- Instead of using internal private dynamic IP addresses
+- If a Pod is recreated, the service stays in place 
+- Pods and services have different life cycles 
+- A service has two main functionalities:
+   - A permanent IP address 
+   - A load balancer (how and why?)
+---
+
+KubernetesConfigurations
+
+- A Deployment is a template/blueprint for creating Pods 
+- Such configurations are declarative (is == should)
