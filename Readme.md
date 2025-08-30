@@ -52,10 +52,24 @@ This is the recommended method for local development, as it provides hot-reloadi
     To see the logs from all running services, use:
 
     ```bash
-    docker compose logs -f
+    docker compose logs [-f]
     ```
 
-3.  **Stop the services:**
+3.  **View Logs for a Specific Service:**
+    If you need to debug a specific part of the application, you can view the logs for an individual service:
+
+    ```bash
+    # View backend API logs
+    docker compose logs [-f] api
+
+    # View frontend logs
+    docker compose logs [-f] frontend
+
+    # View database logs
+    docker compose logs [-f] mongo
+    ```
+
+4.  **Stop the services:**
 
     - **To stop the containers (preserving data):**
       This is the standard way to stop the application. Your database data and `node_modules` volumes will be kept.
@@ -68,7 +82,7 @@ This is the recommended method for local development, as it provides hot-reloadi
       docker compose down --volumes
       ```
 
-4.  **Updating Dependencies (Important):**
+5.  **Updating Dependencies (Important):**
     Because this project isolates the container's `node_modules` for performance and stability, you must follow these steps whenever you add or remove a package in `package.json`:
 
     ```bash
