@@ -8,7 +8,7 @@ metadata:
     service: frontend
   name: frontend
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: "5173"
       port: 5173
