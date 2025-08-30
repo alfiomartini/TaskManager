@@ -2,14 +2,16 @@
 
 This is the Task Manager, a full-stack application featuring a React frontend and a Node.js/Express backend, with MongoDB as the database. The project is fully containerized and includes configurations to run the entire stack on both Docker Compose for local development and Kubernetes (via Minikube) for a more robust deployment simulation.
 
-## Table of Contents
+<!-- TOC -->
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Application Access](#application-access)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+- [Task Manager](#task-manager)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+    - [Option 1: Docker Compose (for Local Development)](#option-1-docker-compose-for-local-development)
+    - [Option 2: Kubernetes with Minikube](#option-2-kubernetes-with-minikube)
+  - [Project Structure](#project-structure)
+
+<!-- /TOC -->
 
 ## Installation
 
