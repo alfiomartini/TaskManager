@@ -150,11 +150,35 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     ```bash
     kubectl get pods -w
     ```
-7.  **Access the application:** This command creates a tunnel to the frontend service and opens it in your browser.
+7.  **Access the application:**
+
+    There are two ways to access the frontend service running in Minikube.
+
+    **a) Via NodePort (Recommended for a stable URL)**
+
+    This method exposes the service on a fixed port on the Minikube node's IP, providing a stable URL that doesn't require a command to be running in the foreground.
+
+    1.  **Get the Minikube IP:**
+
+        ```bash
+        minikube ip
+        ```
+
+        This will return an IP address (e.g., `192.168.49.2`).
+
+    2.  **Find the NodePort:** The port is defined in the `kubernetes/frontend-service.yaml` file under `spec.ports.nodePort`. In this project, it is set to **30100**.
+
+    3.  **Access the URL:** Combine the IP and port in your browser: `http://<MINIKUBE_IP>:30100`. For example: `http://192.168.49.2:30100`.
+
+    **b) Via `minikube service` command (Development Tunnel)**
+
+    This command is a convenient utility that tunnels traffic from your local machine directly to the service's internal `ClusterIP`. It runs as a foreground process in your terminal and automatically opens the correct URL in your browser. Because it's a temporary tunnel, the connection will close if you stop the command (e.g., with `Ctrl+C`).
+
     ```bash
     minikube service frontend
     ```
-8.  **Open the Kubernetes Dashboard (optional):**
+
+8.  **Open the Kubernetes Dashboard (optional):** This provides a web-based UI for your cluster.
     ```bash
     minikube dashboard
     ```
