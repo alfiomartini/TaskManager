@@ -42,12 +42,46 @@ You can run the entire application stack using either Docker Compose or Kubernet
 This is the recommended method for local development, as it provides hot-reloading for code changes.
 
 1.  **Start the services:**
+    This command builds the images if they don't exist and starts all services in the background.
+
     ```bash
-    docker compose up --build
+    docker compose up --build -d
     ```
-2.  **To stop the services:**
-    - To stop and keep data: `docker compose down`
-    - To stop and remove all data: `docker compose down --volumes`
+
+2.  **View logs:**
+    To see the logs from all running services, use:
+
+    ```bash
+    docker compose logs -f
+    ```
+
+3.  **Stop the services:**
+
+    - **To stop the containers (preserving data):**
+      This is the standard way to stop the application. Your database data and `node_modules` volumes will be kept.
+      ```bash
+      docker compose down
+      ```
+    - **To stop and remove all data (destructive):**
+      Use this command if you want a completely fresh start. It will remove the containers, networks, and **all** volumes for this project, including your database.
+      ```bash
+      docker compose down --volumes
+      ```
+
+4.  **Updating Dependencies (Important):**
+    Because this project isolates the container's `node_modules` for performance and stability, you must follow these steps whenever you add or remove a package in `package.json`:
+
+    ```bash
+    # 1. Stop the running containers
+    docker compose down
+
+    # 2. Remove only the dependency volumes to force a fresh `npm install`.
+    # Note: The volume names are prefixed with your project directory name (e.g., taskmanager_...).
+    docker volume rm taskmanager_api_node_modules taskmanager_frontend_node_modules
+
+    # 3. Rebuild and restart the application
+    docker compose up --build -d
+    ```
 
 ### Option 2: Kubernetes with Minikube
 
