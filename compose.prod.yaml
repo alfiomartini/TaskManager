@@ -1,0 +1,63 @@
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: taskmanager-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=task-manager
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - task-manager-network
+
+  api:
+    image: docker.io/armartini/taskmanager-api:v1
+    container_name: taskmanager-api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/task-manager?authSource=admin
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - task-manager-network
+
+  frontend:
+    image: docker.io/armartini/taskmanager-frontend:v1
+    container_name: taskmanager-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - task-manager-network
+
+  mongo-express:
+    image: mongo-express
+    container_name: taskmanager-mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_PASSWORD}
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_BASICAUTH_USERNAME=${EXPRESS_USER}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${EXPRESS_PASSWORD}
+    depends_on:
+      - mongo
+    networks:
+      - task-manager-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  task-manager-network:
+    driver: bridge

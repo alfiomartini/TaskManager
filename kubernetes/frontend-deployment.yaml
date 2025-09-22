@@ -13,18 +13,18 @@ spec:
     matchLabels:
       service: frontend
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f ../compose.yaml
-        kompose.version: 1.37.0 (fb0539e64)
       labels:
         service: frontend
     spec:
       containers:
-        - image: taskmanager-frontend
-          imagePullPolicy: IfNotPresent
+        - image: docker.io/armartini/taskmanager-frontend:v1
+          imagePullPolicy: Always
           name: taskmanager-frontend
           ports:
             - containerPort: 5173

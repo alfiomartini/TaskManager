@@ -60,7 +60,7 @@ This is the recommended method for local development, as it provides hot-reloadi
 3.  **Access the application:**
 
     - Frontend: The React application is available at http://localhost:5173.
-    - Backend API: The Node.js Express API is running at http://localhost:3000.
+    - Backend API: The Node.js/Express API is available at http://localhost:3000.
     - Mongo Express: The database UI is available at http://localhost:8081.
 
 4.  **View Logs for a Specific Service:**

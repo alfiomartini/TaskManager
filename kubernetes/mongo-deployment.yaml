@@ -13,17 +13,19 @@ spec:
     matchLabels:
       service: mongo
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f ../compose.yaml
-        kompose.version: 1.37.0 (fb0539e64)
       labels:
         service: mongo
     spec:
       containers:
-        - env:
+        - image: mongo:7.0
+          name: taskmanager-mongo
+          env:
             - name: MONGO_INITDB_DATABASE
               value: task-manager
             - name: MONGO_INITDB_ROOT_USERNAME
@@ -36,8 +38,6 @@ spec:
                 secretKeyRef:
                   name: taskmanager-secrets
                   key: mongo-password
-          image: mongo:7.0
-          name: taskmanager-mongo
           ports:
             - containerPort: 27017
               protocol: TCP

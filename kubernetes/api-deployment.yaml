@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../compose.yaml
-    kompose.version: 1.37.0 (fb0539e64)
   labels:
     service: api
   name: api
@@ -13,17 +10,20 @@ spec:
     matchLabels:
       service: api
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f ../compose.yaml
-        kompose.version: 1.37.0 (fb0539e64)
       labels:
         service: api
     spec:
       containers:
-        - env:
+        - image: docker.io/armartini/taskmanager-api:v1
+          imagePullPolicy: Always
+          name: taskmanager-api
+          env:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -41,9 +41,6 @@ spec:
                   key: mongo-password
             - name: MONGO_URI
               value: mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongo:27017/task-manager?authSource=admin
-          image: taskmanager-api
-          imagePullPolicy: IfNotPresent
-          name: taskmanager-api
           ports:
             - containerPort: 3000
               protocol: TCP
