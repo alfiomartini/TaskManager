@@ -14,9 +14,6 @@ spec:
       service: mongo-express
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert -f ../compose.yaml
-        kompose.version: 1.37.0 (fb0539e64)
       labels:
         service: mongo-express
     spec:
