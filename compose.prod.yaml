@@ -15,7 +15,7 @@ services:
       - task-manager-network
 
   api:
-    image: docker.io/armartini/taskmanager-api:v1
+    image: docker.io/armartini/taskmanager-api:v2
     container_name: taskmanager-api
     ports:
       - "3000:3000"
@@ -28,7 +28,7 @@ services:
       - task-manager-network
 
   frontend:
-    image: docker.io/armartini/taskmanager-frontend:v1
+    image: docker.io/armartini/taskmanager-frontend:v2
     container_name: taskmanager-frontend
     ports:
       - "5173:5173"

@@ -20,7 +20,7 @@ spec:
         service: api
     spec:
       containers:
-        - image: docker.io/armartini/taskmanager-api:v1
+        - image: docker.io/armartini/taskmanager-api:v2
           imagePullPolicy: Always
           name: taskmanager-api
           env:

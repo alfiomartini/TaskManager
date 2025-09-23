@@ -12,7 +12,7 @@ export const authSignUp = async (
 ): Promise<SignUpResponse> => {
   try {
     const response = await axios.post<SignUpResponse>(
-      "http://localhost:3000/api/auth/signup",
+      "backend/api/auth/signup",
       formData
     );
     return response.data;
@@ -30,7 +30,7 @@ export const authSignIn = async (
 ): Promise<SignInResponse> => {
   try {
     const response = await axios.post<SignInResponse>(
-      "http://localhost:3000/api/auth/signin",
+      "backend/api/auth/signin",
       formData
     );
     return response.data;
@@ -50,14 +50,11 @@ export const taskList = async (): Promise<Task[]> => {
       throw new Error("No token found");
     }
 
-    const response = await axios.get<Task[]>(
-      "http://localhost:3000/api/tasks/list",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get<Task[]>("backend/api/tasks/list", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -79,7 +76,7 @@ export const addTask = async (
     }
 
     const response: AxiosResponse<Task> = await axios.post(
-      "http://localhost:3000/api/tasks/create",
+      "backend/api/tasks/create",
       task,
       {
         headers: {
@@ -105,7 +102,7 @@ export const deleteTask = async (id: string): Promise<void> => {
       throw new Error("No token found");
     }
 
-    await axios.delete(`http://localhost:3000/api/tasks/delete/${id}`, {
+    await axios.delete(`backend/api/tasks/delete/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -132,7 +129,7 @@ export const updateTask = async (
     }
 
     const response: AxiosResponse<Task> = await axios.put(
-      `http://localhost:3000/api/tasks/update/${id}`,
+      `backend/api/tasks/update/${id}`,
       task,
       {
         headers: {

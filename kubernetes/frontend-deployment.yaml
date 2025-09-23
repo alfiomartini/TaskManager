@@ -23,7 +23,7 @@ spec:
         service: frontend
     spec:
       containers:
-        - image: docker.io/armartini/taskmanager-frontend:v1
+        - image: docker.io/armartini/taskmanager-frontend:v2
           imagePullPolicy: Always
           name: taskmanager-frontend
           ports:
