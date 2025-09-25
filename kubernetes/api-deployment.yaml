@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - image: docker.io/armartini/taskmanager-api:v2
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: taskmanager-api
           env:
             - name: JWT_SECRET

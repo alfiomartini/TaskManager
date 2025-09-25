@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../compose.yaml
-    kompose.version: 1.37.0 (fb0539e64)
   labels:
     service: frontend
   name: frontend
@@ -24,7 +21,7 @@ spec:
     spec:
       containers:
         - image: docker.io/armartini/taskmanager-frontend:v2
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: taskmanager-frontend
           ports:
             - containerPort: 5173
