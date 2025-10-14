@@ -1,0 +1,32 @@
+# Production values for taskmanager
+# Override default values for production deployment
+
+# Scale up for production
+api:
+  replicaCount: 3
+  service:
+    type: ClusterIP  # Use LoadBalancer if you have one available
+
+frontend:
+  replicaCount: 2
+  service:
+    type: LoadBalancer  # Change to LoadBalancer for production
+    # nodePort: null    # Remove nodePort when using LoadBalancer
+
+# Production MongoDB settings
+mongodb:
+  replicaCount: 1  # For production, consider using a managed database service
+  persistence:
+    enabled: true
+    size: 10Gi  # Larger storage for production
+    storageClass: "fast-ssd"  # Use appropriate storage class
+
+# Disable Mongo Express in production for security
+mongoExpress:
+  enabled: false
+
+# Production secrets (these should be overridden via --set or external secret management)
+secrets:
+  mongoUser: "produser"
+  mongoPassword: "change-this-in-production"
+  jwtSecret: "a-very-long-and-secure-jwt-secret-for-production"

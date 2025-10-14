@@ -1,0 +1,15 @@
+apiVersion: v2
+name: taskmanager
+description: A full-stack Task Manager application with React frontend, Node.js backend, and MongoDB
+type: application
+version: 0.1.0
+appVersion: "v2"
+keywords:
+  - taskmanager
+  - react
+  - nodejs
+  - mongodb
+home: https://github.com/alfiomartini/TaskManager
+maintainers:
+  - name: Alfio Martini
+    email: your-email@example.com

@@ -9,6 +9,13 @@ This is the Task Manager, a full-stack application featuring a React frontend an
   - [Running the Application](#running-the-application)
     - [Option 1: Docker Compose (for Local Development)](#option-1-docker-compose-for-local-development)
     - [Option 2: Kubernetes with Minikube](#option-2-kubernetes-with-minikube)
+    - [Option 3: Kubernetes with Helm](#option-3-kubernetes-with-helm)
+      - [Helm Chart Configuration](#helm-chart-configuration)
+  - [Helm Commands Reference](#helm-commands-reference)
+    - [Installation and Deployment](#installation-and-deployment)
+    - [Management and Updates](#management-and-updates)
+    - [Debugging and Development](#debugging-and-development)
+    - [Cleanup](#cleanup)
   - [Project Structure](#project-structure)
 
 <!-- /TOC -->
@@ -47,7 +54,7 @@ This is the recommended method for local development, as it provides hot-reloadi
     This command builds the images if they don't exist and starts all services in the background.
 
     ```bash
-    docker compose up --build -d
+    docker compose -f compose.dev.yaml up --build -d
     ```
 
 2.  **View logs:**
@@ -102,7 +109,7 @@ This is the recommended method for local development, as it provides hot-reloadi
     docker volume rm taskmanager_api_node_modules taskmanager_frontend_node_modules
 
     # 3. Rebuild and restart the application
-    docker compose up --build -d
+    docker compose -f compose.dev.yaml up --build -d
     ```
 
 ### Option 2: Kubernetes with Minikube
@@ -142,7 +149,7 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     ```
 4.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
     ```bash
-    docker compose build
+    docker compose -f compose.dev.yaml build
     ```
 5.  **Apply the Kubernetes manifests:** This creates all the necessary Deployments, Services, Secrets, and the PersistentVolumeClaim in your cluster.
     ```bash
@@ -200,6 +207,153 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     minikube dashboard
     ```
 
+### Option 3: Kubernetes with Helm
+
+This workflow uses Helm, the package manager for Kubernetes, to deploy the application. This is a more advanced and scalable method for managing Kubernetes applications.
+
+1.  **Start Minikube:**
+
+    ```bash
+    minikube start
+    ```
+
+2.  **Point your Docker client to Minikube's daemon:** This ensures that when you build images, they are available inside the Minikube cluster.
+
+    ```bash
+    eval $(minikube docker-env)
+    ```
+
+3.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
+
+    ```bash
+    docker compose -f compose.dev.yaml build
+    ```
+
+4.  **Install the Helm Chart:**
+    This command installs the Task Manager chart into your Kubernetes cluster. It creates a new "release" named `task-manager`.
+
+    ```bash
+    # Install with default values
+    helm install task-manager ./charts/taskmanager
+
+    # Or install with custom values from your .env file
+    helm install task-manager ./charts/taskmanager \
+      --set secrets.mongoUser="$(grep MONGO_USER .env | cut -d '=' -f2)" \
+      --set secrets.mongoPassword="$(grep MONGO_PASSWORD .env | cut -d '=' -f2)" \
+      --set secrets.jwtSecret="$(grep JWT_SECRET .env | cut -d '=' -f2)" \
+      --set secrets.expressUser="$(grep EXPRESS_USER .env | cut -d '=' -f2)" \
+      --set secrets.expressPassword="$(grep EXPRESS_PASSWORD .env | cut -d '=' -f2)"
+    ```
+
+5.  **Check the deployment status:**
+
+    ```bash
+    # View all resources created by the Helm release
+    helm status task-manager
+
+    # Watch pods until they're running
+    kubectl get pods -w
+    ```
+
+6.  **Access the application:**
+    The application will be accessible the same way as in Option 2 (Kubernetes with Minikube):
+
+    - **Frontend**: `http://<MINIKUBE_IP>:30100` (where MINIKUBE_IP is from `minikube ip`)
+    - **Mongo Express**: `http://<MINIKUBE_IP>:30081`
+    - **API**: Available internally at `<release-name>-taskmanager-api:3000`
+
+7.  **Upgrade the application:**
+
+    ```bash
+    # Upgrade with new image tags
+    helm upgrade task-manager ./charts/taskmanager --set api.image.tag=v3 --set frontend.image.tag=v3
+    ```
+
+8.  **Uninstall the application:**
+    ```bash
+    # Remove all resources created by this Helm release
+    helm uninstall task-manager
+    ```
+
+#### Helm Chart Configuration
+
+The Helm chart supports extensive customization through the `values.yaml` file. Key configuration options include:
+
+- **Image settings**: Repository, tags, and pull policies
+- **Replica counts**: Scale individual components
+- **Service types**: Change from NodePort to LoadBalancer or ClusterIP
+- **Persistence**: Enable/disable MongoDB data persistence
+- **Secrets**: Configure authentication credentials
+- **Mongo Express**: Enable/disable the database UI
+
+To customize the deployment, either:
+
+1. Edit `charts/taskmanager/values.yaml` directly
+2. Create a custom values file: `helm install task-manager ./charts/taskmanager -f my-values.yaml`
+3. Use `--set` flags: `helm install task-manager ./charts/taskmanager --set frontend.replicaCount=3`
+
+## Helm Commands Reference
+
+Here are the essential Helm commands for managing your Task Manager deployment:
+
+### Installation and Deployment
+
+```bash
+# Install the chart
+helm install <release-name> ./charts/taskmanager
+
+# Install with custom values
+helm install <release-name> ./charts/taskmanager -f custom-values.yaml
+
+# Install with inline value overrides
+helm install <release-name> ./charts/taskmanager --set api.replicaCount=2
+```
+
+### Management and Updates
+
+```bash
+# List all releases
+helm list
+
+# Get release status and resources
+helm status <release-name>
+
+# Upgrade a release
+helm upgrade <release-name> ./charts/taskmanager
+
+# Rollback to previous version
+helm rollback <release-name> <revision-number>
+
+# View release history
+helm history <release-name>
+```
+
+### Debugging and Development
+
+```bash
+# Dry run - see what would be installed without actually installing
+helm install <release-name> ./charts/taskmanager --dry-run --debug
+
+# Template - render templates locally
+helm template <release-name> ./charts/taskmanager
+
+# Get values for a release
+helm get values <release-name>
+
+# Get all information about a release
+helm get all <release-name>
+```
+
+### Cleanup
+
+```bash
+# Uninstall a release
+helm uninstall <release-name>
+
+# Uninstall and keep history
+helm uninstall <release-name> --keep-history
+```
+
 ## Project Structure
 
 ```bash
@@ -207,11 +361,27 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
 ├── backend
 │   ├── Dockerfile      # Backend service Docker image definition
 │   └── src             # Node.js/Express source code
+├── charts
+│   └── taskmanager     # Helm chart for the application
+│       ├── Chart.yaml  # Chart metadata
+│       ├── values.yaml # Default configuration values
+│       └── templates   # Kubernetes manifest templates
+│           ├── _helpers.tpl
+│           ├── api-deployment.yaml
+│           ├── api-service.yaml
+│           ├── frontend-deployment.yaml
+│           ├── frontend-service.yaml
+│           ├── mongodb-deployment.yaml
+│           ├── mongodb-service.yaml
+│           ├── mongodb-pvc.yaml
+│           ├── mongo-express-deployment.yaml
+│           ├── mongo-express-service.yaml
+│           └── secrets.yaml
 ├── compose.yaml
 ├── frontend
 │   ├── Dockerfile      # Frontend service Docker image definition
 │   └── src             # React/Vite source code
-├── kubernetes
+├── kubernetes          # Raw Kubernetes manifests
 │   ├── api-deployment.yaml
 │   ├── api-service.yaml
 │   ├── frontend-deployment.yaml
@@ -220,7 +390,8 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
 │   ├── mongo-deployment.yaml
 │   ├── mongo-express-deployment.yaml
 │   ├── mongo-express-service.yaml
-│   └── mongo-service.yaml
+│   ├── mongo-service.yaml
+│   └── taskmanager-secrets.yaml
 ├── .env.example        # Example environment variables
 └── Readme.md
 ```
