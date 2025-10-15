@@ -1,32 +1,67 @@
 # Production values for taskmanager
 # Override default values for production deployment
 
-# Scale up for production
+# Global settings
+global:
+  imageRegistry: docker.io
+  imagePullPolicy: IfNotPresent
+
+# API (Backend) configuration
 api:
+  image:
+    repository: armartini/taskmanager-api
+    tag: v2
   replicaCount: 3
   service:
-    type: ClusterIP  # Use LoadBalancer if you have one available
+    type: ClusterIP
+    port: 3000
+  env:
+    mongoDatabase: task-manager
 
+# Frontend configuration
 frontend:
+  image:
+    repository: armartini/taskmanager-frontend
+    tag: v2
   replicaCount: 2
   service:
-    type: LoadBalancer  # Change to LoadBalancer for production
-    # nodePort: null    # Remove nodePort when using LoadBalancer
+    # Get IP with 'kubectl get svc frontend', access http://<EXTERNAL-IP>:5173
+    # For Minikube: Run 'minikube tunnel' first
+    type: LoadBalancer
+    port: 5173
 
-# Production MongoDB settings
+# MongoDB configuration
 mongodb:
-  replicaCount: 1  # For production, consider using a managed database service
+  image:
+    repository: mongo
+    tag: "7.0"
+  replicaCount: 1 # Consider managed database service for production
+  service:
+    type: ClusterIP
+    port: 27017
   persistence:
     enabled: true
-    size: 10Gi  # Larger storage for production
-    storageClass: "fast-ssd"  # Use appropriate storage class
+    size: 10Gi
+    storageClass: "" # Use cluster default or specify production storage class
+  env:
+    database: task-manager
 
-# Disable Mongo Express in production for security
-mongoExpress:
+# MongoDB Express configuration - disabled for security
+mongo-express:
   enabled: false
+  image:
+    repository: mongo-express
+    tag: latest
+  replicaCount: 1
+  service:
+    type: NodePort  # Access via http://<minikube-ip>:30081 (not used when enabled: false)
+    port: 8081
+    nodePort: 30081
 
-# Production secrets (these should be overridden via --set or external secret management)
+# Production secrets (override these via --set or external secret management)
 secrets:
-  mongoUser: "produser"
-  mongoPassword: "change-this-in-production"
-  jwtSecret: "a-very-long-and-secure-jwt-secret-for-production"
+  mongoUser: produser
+  mongoPassword: change-this-in-production
+  expressUser: not-used-in-production
+  expressPassword: not-used-in-production
+  jwtSecret: a-very-long-and-secure-jwt-secret-for-production

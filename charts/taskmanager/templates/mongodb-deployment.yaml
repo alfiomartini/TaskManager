@@ -1,15 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "taskmanager.fullname" . }}-mongodb
+  name: mongo
   labels:
-    {{- include "taskmanager.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: mongodb
 spec:
   replicas: {{ .Values.mongodb.replicaCount }}
   selector:
     matchLabels:
-      {{- include "taskmanager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/component: mongodb
   strategy:
     type: RollingUpdate
@@ -19,7 +20,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "taskmanager.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: mongodb
     spec:
       containers:
@@ -32,12 +33,12 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-user
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-password
           ports:
             - name: mongodb
@@ -53,5 +54,5 @@ spec:
       volumes:
         - name: mongodb-data
           persistentVolumeClaim:
-            claimName: {{ include "taskmanager.fullname" . }}-mongodb-data
+            claimName: mongodb-data
       {{- end }}

@@ -1,15 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "taskmanager.fullname" . }}-api
+  name: api
   labels:
-    {{- include "taskmanager.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: api
 spec:
   replicas: {{ .Values.api.replicaCount }}
   selector:
     matchLabels:
-      {{- include "taskmanager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/component: api
   strategy:
     type: RollingUpdate
@@ -19,7 +20,7 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "taskmanager.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: api
     spec:
       containers:
@@ -30,20 +31,20 @@ spec:
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: jwt-secret
             - name: MONGO_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-user
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-password
             - name: MONGO_URI
-              value: "mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@{{ include "taskmanager.fullname" . }}-mongodb:{{ .Values.mongodb.service.port }}/{{ .Values.api.env.mongoDatabase }}?authSource=admin"
+              value: "mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongo:{{ .Values.mongodb.service.port }}/{{ .Values.api.env.mongoDatabase }}?authSource=admin"
           ports:
             - name: http
               containerPort: {{ .Values.api.service.port }}

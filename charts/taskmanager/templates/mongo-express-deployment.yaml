@@ -1,16 +1,17 @@
-{{- if .Values.mongoExpress.enabled }}
+{{- if (index .Values "mongo-express").enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "taskmanager.fullname" . }}-mongo-express
+  name: mongo-express
   labels:
-    {{- include "taskmanager.labels" . | nindent 4 }}
+    app.kubernetes.io/name: {{ .Chart.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: mongo-express
 spec:
-  replicas: {{ .Values.mongoExpress.replicaCount }}
+  replicas: {{ (index .Values "mongo-express").replicaCount }}
   selector:
     matchLabels:
-      {{- include "taskmanager.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
       app.kubernetes.io/component: mongo-express
   strategy:
     type: RollingUpdate
@@ -20,39 +21,39 @@ spec:
   template:
     metadata:
       labels:
-        {{- include "taskmanager.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app.kubernetes.io/component: mongo-express
     spec:
       containers:
         - name: mongo-express
-          image: "{{ .Values.global.imageRegistry }}/{{ .Values.mongoExpress.image.repository }}:{{ .Values.mongoExpress.image.tag }}"
+          image: "{{ .Values.global.imageRegistry }}/{{ (index .Values "mongo-express").image.repository }}:{{ (index .Values "mongo-express").image.tag }}"
           imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           env:
             - name: ME_CONFIG_MONGODB_ADMINUSERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-user
             - name: ME_CONFIG_MONGODB_ADMINPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: mongo-password
             - name: ME_CONFIG_MONGODB_URL
-              value: "mongodb://$(ME_CONFIG_MONGODB_ADMINUSERNAME):$(ME_CONFIG_MONGODB_ADMINPASSWORD)@{{ include "taskmanager.fullname" . }}-mongodb:{{ .Values.mongodb.service.port }}/"
+              value: "mongodb://$(ME_CONFIG_MONGODB_ADMINUSERNAME):$(ME_CONFIG_MONGODB_ADMINPASSWORD)@mongo:{{ .Values.mongodb.service.port }}/"
             - name: ME_CONFIG_BASICAUTH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: express-user
             - name: ME_CONFIG_BASICAUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "taskmanager.fullname" . }}-secrets
+                  name: taskmanager-secrets
                   key: express-password
           ports:
             - name: http
-              containerPort: {{ .Values.mongoExpress.service.port }}
+              containerPort: {{ (index .Values "mongo-express").service.port }}
               protocol: TCP
       restartPolicy: Always
 {{- end }}
