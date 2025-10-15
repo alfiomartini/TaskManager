@@ -46,69 +46,76 @@ This is the Task Manager, a full-stack application featuring a React frontend an
 
 You can run the entire application stack using either Docker Compose or Kubernetes (with Minikube).
 
-### Option 1: Docker Compose (for Local Development)
+### Option 1: Docker Compose
 
-This is the recommended method for local development, as it provides hot-reloading for code changes.
+You can run the application in either development or production mode using Docker Compose.
+
+#### Development Mode (Recommended for Local Development)
+
+This mode provides hot-reloading for code changes.
 
 1.  **Start the services:**
-    This command builds the images if they don't exist and starts all services in the background.
-
     ```bash
     docker compose -f compose.dev.yaml up --build -d
     ```
 
 2.  **View logs:**
-    To see the logs from all running services, use:
-
     ```bash
-    docker compose logs [-f]
+    # All services
+    docker compose -f compose.dev.yaml logs [-f]
+    
+    # Specific service
+    docker compose -f compose.dev.yaml logs [-f] api
     ```
+
+#### Production Mode
+
+This mode uses optimized production images.
+
+1.  **Start the services:**
+    ```bash
+    docker compose -f compose.prod.yaml up --build -d
+    ```
+
+2.  **View logs:**
+    ```bash
+    # All services
+    docker compose -f compose.prod.yaml logs [-f]
+    
+    # Specific service
+    docker compose -f compose.prod.yaml logs [-f] api
+    ```
+
+#### Common Operations (Both Modes)
 
 3.  **Access the application:**
+    - Frontend: http://localhost:5173
+    - Backend API: http://localhost:3000
+    - Mongo Express: http://localhost:8081
 
-    - Frontend: The React application is available at http://localhost:5173.
-    - Backend API: The Node.js/Express API is available at http://localhost:3000.
-    - Mongo Express: The database UI is available at http://localhost:8081.
-
-4.  **View Logs for a Specific Service:**
-    If you need to debug a specific part of the application, you can view the logs for an individual service:
-
+4.  **Stop the services:**
     ```bash
-    # View backend API logs
-    docker compose logs [-f] api
-
-    # View frontend logs
-    docker compose logs [-f] frontend
-
-    # View database logs
-    docker compose logs [-f] mongo
+    # Development mode
+    docker compose -f compose.dev.yaml down
+    
+    # Production mode
+    docker compose -f compose.prod.yaml down
+    
+    # Remove all data (destructive)
+    docker compose -f compose.dev.yaml down --volumes
     ```
 
-5.  **Stop the services:**
-
-    - **To stop the containers (preserving data):**
-      This is the standard way to stop the application. Your database data and `node_modules` volumes will be kept.
-      ```bash
-      docker compose down
-      ```
-    - **To stop and remove all data (destructive):**
-      Use this command if you want a completely fresh start. It will remove the containers, networks, and **all** volumes for this project, including your database.
-      ```bash
-      docker compose down --volumes
-      ```
-
-6.  **Updating Dependencies (Important):**
-    Because this project isolates the container's `node_modules` for performance and stability, you must follow these steps whenever you add or remove a package in `package.json`:
+5.  **Updating Dependencies (Development Mode Only):**
+    Because development mode isolates `node_modules` for hot-reloading, follow these steps when updating `package.json`:
 
     ```bash
-    # 1. Stop the running containers
-    docker compose down
+    # 1. Stop the containers
+    docker compose -f compose.dev.yaml down
 
-    # 2. Remove only the dependency volumes to force a fresh `npm install`.
-    # Note: The volume names are prefixed with your project directory name (e.g., taskmanager_...).
+    # 2. Remove dependency volumes
     docker volume rm taskmanager_api_node_modules taskmanager_frontend_node_modules
 
-    # 3. Rebuild and restart the application
+    # 3. Rebuild and restart
     docker compose -f compose.dev.yaml up --build -d
     ```
 
@@ -147,9 +154,22 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     ```bash
     eval $(minikube docker-env)
     ```
-4.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
+4.  **Build the application images (Optional):**
+    
+    **Option A: Build locally and tag for Kubernetes**
     ```bash
+    # Build images
     docker compose -f compose.dev.yaml build
+    
+    # Tag with proper names to match Kubernetes manifests
+    docker tag taskmanager-api:latest armartini/taskmanager-api:v2
+    docker tag taskmanager-frontend:latest armartini/taskmanager-frontend:v2
+    ```
+    
+    **Option B: Use existing images from Docker Hub**
+    ```bash
+    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2 
+    # and armartini/taskmanager-frontend:v2 from Docker Hub automatically
     ```
 5.  **Apply the Kubernetes manifests:** This creates all the necessary Deployments, Services, Secrets, and the PersistentVolumeClaim in your cluster.
     ```bash
@@ -223,21 +243,34 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
     eval $(minikube docker-env)
     ```
 
-3.  **Build the application images:** Use Docker Compose to build the `api` and `frontend` images. They will be built inside Minikube's environment.
-
+3.  **Build the application images (Optional):**
+    
+    **Option A: Build locally and tag for Kubernetes**
     ```bash
+    # Build images
     docker compose -f compose.dev.yaml build
+    
+    # Tag with proper names to match Kubernetes manifests
+    docker tag taskmanager-api:latest armartini/taskmanager-api:v2
+    docker tag taskmanager-frontend:latest armartini/taskmanager-frontend:v2
+    ```
+    
+    **Option B: Use existing images from Docker Hub**
+    ```bash
+    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2 
+    # and armartini/taskmanager-frontend:v2 from Docker Hub automatically
     ```
 
 4.  **Install the Helm Chart:**
-    This command installs the Task Manager chart into your Kubernetes cluster. It creates a new "release" named `task-manager`.
+    This command installs the Task Manager chart into your Kubernetes cluster. It creates a new "release" named `taskmanager-dev`.
 
     ```bash
     # Install with default values
-    helm install task-manager ./charts/taskmanager
+    helm install taskmanager-dev ./charts/taskmanager
 
     # Or install with custom values from your .env file
-    helm install task-manager ./charts/taskmanager \
+    helm install taskmanager-dev ./charts/taskmanager \
+      -f ./charts/taskmanager/values-dev.yaml \
       --set secrets.mongoUser="$(grep MONGO_USER .env | cut -d '=' -f2)" \
       --set secrets.mongoPassword="$(grep MONGO_PASSWORD .env | cut -d '=' -f2)" \
       --set secrets.jwtSecret="$(grep JWT_SECRET .env | cut -d '=' -f2)" \
@@ -249,7 +282,7 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
 
     ```bash
     # View all resources created by the Helm release
-    helm status task-manager
+    helm status taskmanager-dev
 
     # Watch pods until they're running
     kubectl get pods -w
@@ -266,13 +299,13 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
 
     ```bash
     # Upgrade with new image tags
-    helm upgrade task-manager ./charts/taskmanager --set api.image.tag=v3 --set frontend.image.tag=v3
+    helm upgrade taskmanager-dev ./charts/taskmanager --set api.image.tag=v3 --set frontend.image.tag=v3
     ```
 
 8.  **Uninstall the application:**
     ```bash
     # Remove all resources created by this Helm release
-    helm uninstall task-manager
+    helm uninstall taskmanager-dev
     ```
 
 #### Helm Chart Configuration
@@ -332,7 +365,17 @@ helm history <release-name>
 
 ```bash
 # Dry run - see what would be installed without actually installing
-helm install <release-name> ./charts/taskmanager --dry-run --debug
+helm install <release-name> ./charts/taskmanager -f ./charts/taskmanager/values-dev.yaml --dry-run --debug
+
+# Dry run with custom values from .env file (saves output to file)
+helm install taskmanager-dev ./charts/taskmanager \
+  -f ./charts/taskmanager/values-dev.yaml \
+  --set secrets.mongoUser="$(grep MONGO_USER .env | cut -d '=' -f2)" \
+  --set secrets.mongoPassword="$(grep MONGO_PASSWORD .env | cut -d '=' -f2)" \
+  --set secrets.jwtSecret="$(grep JWT_SECRET .env | cut -d '=' -f2)" \
+  --set secrets.expressUser="$(grep EXPRESS_USER .env | cut -d '=' -f2)" \
+  --set secrets.expressPassword="$(grep EXPRESS_PASSWORD .env | cut -d '=' -f2)" \
+  --dry-run > helm-dry-run.txt
 
 # Template - render templates locally
 helm template <release-name> ./charts/taskmanager

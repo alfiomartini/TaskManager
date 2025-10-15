@@ -1,0 +1,67 @@
+# Default values for taskmanager
+# This is a YAML-formatted file.
+
+# Global settings
+global:
+  imageRegistry: docker.io
+  imagePullPolicy: IfNotPresent
+
+# API (Backend) configuration
+api:
+  image:
+    repository: armartini/taskmanager-api
+    tag: v2
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 3000
+  env:
+    mongoDatabase: task-manager
+
+# Frontend configuration
+frontend:
+  image:
+    repository: armartini/taskmanager-frontend
+    tag: v2
+  replicaCount: 1
+  service:
+    type: NodePort  # Access via http://<minikube-ip>:30100
+    port: 5173
+    nodePort: 30100
+
+# MongoDB configuration
+mongodb:
+  image:
+    repository: mongo
+    tag: "7.0"
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 27017
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: ""
+  env:
+    database: task-manager
+
+# MongoDB Express configuration
+mongo-express:
+  enabled: true
+  image:
+    repository: mongo-express
+    tag: latest
+  replicaCount: 1
+  service:
+    type: NodePort  # Access via http://<minikube-ip>:30081
+    port: 8081
+    nodePort: 30081
+
+# Secrets configuration
+secrets:
+  # These will be base64 encoded automatically by Helm
+  mongoUser: admin
+  mongoPassword: secret
+  expressUser: myexpressuser
+  expressPassword: myexpresspass
+  jwtSecret: a-much-better-secret-that-is-not-in-git
