@@ -25,7 +25,7 @@ frontend:
     tag: v2
   replicaCount: 1
   service:
-    type: NodePort  # Access via http://<minikube-ip>:30100
+    type: NodePort # Access via http://<minikube-ip>:30100
     port: 5173
     nodePort: 30100
 
@@ -53,7 +53,7 @@ mongo-express:
     tag: latest
   replicaCount: 1
   service:
-    type: NodePort  # Access via http://<minikube-ip>:30081
+    type: NodePort # Access via http://<minikube-ip>:30081
     port: 8081
     nodePort: 30081
 

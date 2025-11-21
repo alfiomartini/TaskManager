@@ -7,7 +7,10 @@ This is the Task Manager, a full-stack application featuring a React frontend an
 - [Task Manager](#task-manager)
   - [Installation](#installation)
   - [Running the Application](#running-the-application)
-    - [Option 1: Docker Compose (for Local Development)](#option-1-docker-compose-for-local-development)
+    - [Option 1: Docker Compose](#option-1-docker-compose)
+      - [Development Mode (Recommended for Local Development)](#development-mode-recommended-for-local-development)
+      - [Production Mode](#production-mode)
+      - [Common Operations (Both Modes)](#common-operations-both-modes)
     - [Option 2: Kubernetes with Minikube](#option-2-kubernetes-with-minikube)
     - [Option 3: Kubernetes with Helm](#option-3-kubernetes-with-helm)
       - [Helm Chart Configuration](#helm-chart-configuration)
@@ -55,15 +58,17 @@ You can run the application in either development or production mode using Docke
 This mode provides hot-reloading for code changes.
 
 1.  **Start the services:**
+
     ```bash
     docker compose -f compose.dev.yaml up --build -d
     ```
 
 2.  **View logs:**
+
     ```bash
     # All services
     docker compose -f compose.dev.yaml logs [-f]
-    
+
     # Specific service
     docker compose -f compose.dev.yaml logs [-f] api
     ```
@@ -73,15 +78,17 @@ This mode provides hot-reloading for code changes.
 This mode uses optimized production images.
 
 1.  **Start the services:**
+
     ```bash
     docker compose -f compose.prod.yaml up --build -d
     ```
 
 2.  **View logs:**
+
     ```bash
     # All services
     docker compose -f compose.prod.yaml logs [-f]
-    
+
     # Specific service
     docker compose -f compose.prod.yaml logs [-f] api
     ```
@@ -89,18 +96,20 @@ This mode uses optimized production images.
 #### Common Operations (Both Modes)
 
 3.  **Access the application:**
+
     - Frontend: http://localhost:5173
     - Backend API: http://localhost:3000
     - Mongo Express: http://localhost:8081
 
 4.  **Stop the services:**
+
     ```bash
     # Development mode
     docker compose -f compose.dev.yaml down
-    
+
     # Production mode
     docker compose -f compose.prod.yaml down
-    
+
     # Remove all data (destructive)
     docker compose -f compose.dev.yaml down --volumes
     ```
@@ -155,31 +164,44 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     eval $(minikube docker-env)
     ```
 4.  **Build the application images (Optional):**
-    
+
     **Option A: Build locally and tag for Kubernetes**
+
     ```bash
     # Build images
     docker compose -f compose.dev.yaml build
-    
+
     # Tag with proper names to match Kubernetes manifests
     docker tag taskmanager-api:latest armartini/taskmanager-api:v2
     docker tag taskmanager-frontend:latest armartini/taskmanager-frontend:v2
     ```
-    
+
     **Option B: Use existing images from Docker Hub**
+
     ```bash
-    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2 
+    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2
     # and armartini/taskmanager-frontend:v2 from Docker Hub automatically
     ```
-5.  **Apply the Kubernetes manifests:** This creates all the necessary Deployments, Services, Secrets, and the PersistentVolumeClaim in your cluster.
+
+5.  **Create the Namespace and Apply Manifests:** This creates a dedicated namespace for the application and then creates all the necessary resources within it.
+
     ```bash
-    kubectl apply -f kubernetes/
+    # Create the namespace
+    kubectl create namespace taskmgr
+
+    # Apply all manifests to the new namespace
+    kubectl apply -f kubernetes/ -n taskmgr
     ```
+
 6.  **Check pod status (optional):** Wait for all pods to be in the `Running` state.
     ```bash
-    kubectl get pods -w
+    kubectl get pods -n taskmgr -w
     ```
-7.  **Access the application:**
+7.  **Cleanup (Optional):** To delete all the resources you just created:
+    ```bash
+    kubectl delete -f kubernetes/ -n taskmgr
+    ```
+8.  **Access the application:**
 
     There are two ways to access the frontend service running in Minikube.
 
@@ -200,7 +222,7 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
         Run the following command:
 
         ```bash
-        kubectl get service frontend
+        kubectl get service frontend -n taskmgr
         ```
 
         The output will show the port mapping. Look for the high-numbered port in the `PORT(S)` column:
@@ -219,10 +241,10 @@ This workflow demonstrates how to deploy the application to a local Kubernetes c
     This command is a convenient utility that tunnels traffic from your local machine directly to the service's internal `ClusterIP`. It runs as a foreground process in your terminal and automatically opens the correct URL in your browser. Because it's a temporary tunnel, the connection will close if you stop the command (e.g., with `Ctrl+C`).
 
     ```bash
-    minikube service frontend
+    minikube service frontend -n taskmgr
     ```
 
-8.  **Open the Kubernetes Dashboard (optional):** This provides a web-based UI for your cluster.
+9.  **Open the Kubernetes Dashboard (optional):** This provides a web-based UI for your cluster.
     ```bash
     minikube dashboard
     ```
@@ -244,32 +266,35 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
     ```
 
 3.  **Build the application images (Optional):**
-    
+
     **Option A: Build locally and tag for Kubernetes**
+
     ```bash
     # Build images
     docker compose -f compose.dev.yaml build
-    
+
     # Tag with proper names to match Kubernetes manifests
     docker tag taskmanager-api:latest armartini/taskmanager-api:v2
     docker tag taskmanager-frontend:latest armartini/taskmanager-frontend:v2
     ```
-    
+
     **Option B: Use existing images from Docker Hub**
+
     ```bash
-    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2 
+    # Skip this step - Kubernetes will pull armartini/taskmanager-api:v2
     # and armartini/taskmanager-frontend:v2 from Docker Hub automatically
     ```
 
 4.  **Install the Helm Chart:**
-    This command installs the Task Manager chart into your Kubernetes cluster. It creates a new "release" named `taskmanager-dev`.
+    This command installs the Task Manager chart into the `taskmgr` namespace in your Kubernetes cluster. It creates a new "release" named `taskmanager-dev`. The `--create-namespace` flag will create the namespace if it doesn't already exist.
+    This command installs the Task Manager chart into the `taskmgr` namespace in your Kubernetes cluster. It creates a new "release" named `taskmgr-dev`. The `--create-namespace` flag will create the namespace if it doesn't already exist.
 
     ```bash
-    # Install with default values
-    helm install taskmanager-dev ./charts/taskmanager
+    # Install with default values into the 'taskmgr' namespace
+    helm install taskmgr-dev ./charts/taskmanager -n taskmgr --create-namespace
 
     # Or install with custom values from your .env file
-    helm install taskmanager-dev ./charts/taskmanager \
+    helm install taskmgr-dev ./charts/taskmanager -n taskmgr --create-namespace \
       -f ./charts/taskmanager/values-dev.yaml \
       --set secrets.mongoUser="$(grep MONGO_USER .env | cut -d '=' -f2)" \
       --set secrets.mongoPassword="$(grep MONGO_PASSWORD .env | cut -d '=' -f2)" \
@@ -282,10 +307,10 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
 
     ```bash
     # View all resources created by the Helm release
-    helm status taskmanager-dev
+    helm status taskmgr-dev -n taskmgr
 
     # Watch pods until they're running
-    kubectl get pods -w
+    kubectl get pods -n taskmgr -w
     ```
 
 6.  **Access the application:**
@@ -298,14 +323,14 @@ This workflow uses Helm, the package manager for Kubernetes, to deploy the appli
 7.  **Upgrade the application:**
 
     ```bash
-    # Upgrade with new image tags
-    helm upgrade taskmanager-dev ./charts/taskmanager --set api.image.tag=v3 --set frontend.image.tag=v3
+    # Upgrade the release with new image tags
+    helm upgrade taskmgr-dev ./charts/taskmanager -n taskmgr --set api.image.tag=v3 --set frontend.image.tag=v3
     ```
 
 8.  **Uninstall the application:**
     ```bash
     # Remove all resources created by this Helm release
-    helm uninstall taskmanager-dev
+    helm uninstall taskmgr-dev -n taskmgr
     ```
 
 #### Helm Chart Configuration
@@ -333,32 +358,32 @@ Here are the essential Helm commands for managing your Task Manager deployment:
 
 ```bash
 # Install the chart
-helm install <release-name> ./charts/taskmanager
+helm install <release-name> ./charts/taskmanager -n <namespace> --create-namespace
 
 # Install with custom values
-helm install <release-name> ./charts/taskmanager -f custom-values.yaml
+helm install <release-name> ./charts/taskmanager -n <namespace> --create-namespace -f custom-values.yaml
 
 # Install with inline value overrides
-helm install <release-name> ./charts/taskmanager --set api.replicaCount=2
+helm install <release-name> ./charts/taskmanager -n <namespace> --create-namespace --set api.replicaCount=2
 ```
 
 ### Management and Updates
 
 ```bash
 # List all releases
-helm list
+helm list -n <namespace>
 
 # Get release status and resources
-helm status <release-name>
+helm status <release-name> -n <namespace>
 
 # Upgrade a release
-helm upgrade <release-name> ./charts/taskmanager
+helm upgrade <release-name> ./charts/taskmanager -n <namespace>
 
 # Rollback to previous version
-helm rollback <release-name> <revision-number>
+helm rollback <release-name> <revision-number> -n <namespace>
 
 # View release history
-helm history <release-name>
+helm history taskmgr-dev -n taskmgr
 ```
 
 ### Debugging and Development
